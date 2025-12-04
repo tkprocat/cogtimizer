@@ -17,6 +17,15 @@
     <title>Cogtimizer</title>
   </head>
   <body>
+    <div id="notification-banner" class="notification-banner">
+      <span class="notification-text">
+        This is a temporary page while the original <a href="https://monoblos.github.io/cogtimizer/">site</a> gets
+        updated to support World 7 cogs. Credit to <a href="https://github.com/Monoblos/">Monoblos</a> for making the
+        cogtimizer and to <a href="https://github.com/Bolero-fk">Bolero-fk</a> for providing the fix. If you have any
+        questions about the site, contact me on discord at tkprocat.
+      </span>
+      <button class="notification-close" onclick="dismissNotification()">&times;</button>
+    </div>
     <div class="menucontainer">
       <ul class="menu">
         <li id="loaderbtn" class="active"><div><div><div>Loader</div></div></div></li>
@@ -116,6 +125,16 @@
     <p id="start"></p>
     <p id="end"></p>
     <script type="text/javascript">
+      function dismissNotification() {
+        document.getElementById('notification-banner').classList.add('hidden');
+        localStorage.setItem('notificationDismissed', 'true');
+      }
+
+      // Check if notification was previously dismissed
+      if (localStorage.getItem('notificationDismissed') === 'true') {
+        document.getElementById('notification-banner').classList.add('hidden');
+      }
+
       function createSwitchAnimation() {
         let fromDiv,
             timerID;
