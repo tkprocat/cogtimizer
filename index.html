@@ -356,11 +356,17 @@
 
       function mmoifyNumber(num, addSign = true) {
         let str = num;
+        //Fix from https://github.com/Monoblos/cogtimizer/pull/7/files, thanks https://github.com/Xythium
+        const abs = Math.abs(num);
 
-        if (Math.abs(num) >= 1000000) {
-          str = (Math.ceil(num / 10000) / 100) + "M";
-        } else if (Math.abs(num) >= 1000) {
-          str = (Math.ceil(num / 10) / 100) + "K";
+        if (abs >= 1_000_000_000_000) {
+            str = (Math.ceil(num / 10_000_000_000) / 100) + "T";
+        } else if (abs >= 1_000_000_000) {
+            str = (Math.ceil(num / 10_000_000) / 100) + "B";
+        } else if (abs >= 1_000_000) {
+            str = (Math.ceil(num / 10_000) / 100) + "M";
+        } else if (abs >= 1000) {
+            str = (Math.ceil(num / 10) / 100) + "K";
         }
 
         if (addSign && num >= 0) {
