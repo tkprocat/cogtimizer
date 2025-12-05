@@ -52,7 +52,7 @@
     <div class="content">
       <div id="loader">
       <div class="inputarea">
-        <div>Enter config json or username</div>
+        <div style="margin-bottom: 8px;">Please enter the "Raw Data" from idleonefficiency.com, or you can enter your username. If using your username, make sure you have recently published your profile on idleonefficiency.com, otherwise Cogtimizer will pull stale data. If you make changes and want to run another round of optimizing, please change zones in-game before refreshing data from idleonefficiency.com.</div>
         <textarea type="textarea" id="input" rows="10" cols="100"></textarea>
         <div>
           <button id="load" style="max-width: 15ch;">Load</button>
@@ -267,13 +267,23 @@
       f.printBoard = (board, cord1={},cord2={}) => {
         for (let i = 0; i < board.length; i++) {
           const row = createElem("tr");
-          
+
           for (let j = 0; j < board[i].length; j++) {
             window.boardRenderer.set(i, j, board[i][j]);
           }
         }
 
         console.log("Board updated");
+      }
+
+      f.printSpare = (inventory) => {
+        for (let i = 108; i < 200; i++) {
+          const cog = inventory.cogs[i];
+          const index = (i - 108);
+          const row = Math.floor(index / 3);
+          const col = index % 3;
+          window.spareRenderer.set(row, col, cog);
+        }
       }
       
       function yield() {
@@ -443,6 +453,9 @@
       let optimalSteps = undefined;
 
       function stepsChangeHandler(ev) {
+        if (!optimalSteps || optimalSteps.length === 0) {
+          return;
+        }
         const clone = cogInvetory.clone();
         for (let i = 0; i < ev.page; i++) {
           const step = optimalSteps[i];
@@ -455,6 +468,7 @@
 
         // TODO Paddy: clone is now in the state _before_ the move, that should be displayed with the 2 positions highlighted.
         f.printBoard(clone.board);
+        f.printSpare(clone);
         window.boardRenderer.move(pos1, pos2);
 
         if (pos1.location == "spare" || pos2.location == "spare") {
@@ -501,14 +515,14 @@
 
         let start = cogInvetory.clone();
 
-        document.getElementById("start").innerText = `Starting BuildRate: ${start.score.buildRate}, EXP: ${start.score.expBonus}, Flaggy: ${start.score.flaggy}`;
+        document.getElementById("start").innerText = `Starting BuildRate: ${mmoifyNumber(start.score.buildRate, false)}/HR, EXP: ${mmoifyNumber(start.score.expBonus, false)}%, Flaggy: ${mmoifyNumber(start.score.flaggy, false)}/HR`;
         const [buildRate, expBonus, flaggy] = [getInput("buildRate"), getInput("expBonus"), getInput("flaggy")];
         localStorage.setItem("buildRate", buildRate);
         localStorage.setItem("expBonus", expBonus);
         localStorage.setItem("flaggy", flaggy);
         solver.setWeights(getInput("buildRate"), getInput("expBonus"), getInput("flaggy"));
         const best = await solver.solve(cogInvetory, solveTime);
-        document.getElementById("end").innerText = `Final BuildRate: ${best.score.buildRate}, EXP: ${best.score.expBonus}, Flaggy: ${best.score.flaggy}`;
+        document.getElementById("end").innerText = `Final BuildRate: ${mmoifyNumber(best.score.buildRate, false)}/HR, EXP: ${mmoifyNumber(best.score.expBonus, false)}%, Flaggy: ${mmoifyNumber(best.score.flaggy, false)}/HR`;
         
         document.getElementById("buildrate").innerText = `${mmoifyNumber(best.score.buildRate - start.score.buildRate)}/HR`;
         document.getElementById("xpbonus").innerText = `${mmoifyNumber(best.score.expBonus - start.score.expBonus)}%`;
